@@ -9,8 +9,8 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planet, Person, Favorite, Nature
-#from models import Person
+from models import db, User, Planet, People, Favorite, Nature
+#from models import people
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -37,7 +37,6 @@ def sitemap():
 ##USER END POINTS##
 
 @app.route('/user', methods=['GET'])
-@jwt_required()
 def get_all_users():
     
     users = User.query.all()    
@@ -123,23 +122,23 @@ def handle_planet(planet_uid= None):
 				}), 404
 
 
-##PERSON END POINTS##
+##PEOPLE END POINTS##
 
-@app.route('/person', methods=['GET'])
-@app.route('/person/<int:person_uid>', methods=['GET'])
-def handle_person(person_uid= None):
+@app.route('/people', methods=['GET'])
+@app.route('/people/<int:people_uid>', methods=['GET'])
+def handle_people(people_uid= None):
 	if request.method == 'GET':
-		if person_uid is None:
-			people = Person.query.all()
-			people = list(map(lambda person: person.serialize(), people))
+		if people_uid is None:
+			people = People.query.all()
+			people = list(map(lambda people: people.serialize(), people))
 			return jsonify(people),200
 		else:
-			person = Person.query.filter_by(uid=person_uid).first()
-			if person is not None:
-				return jsonify(person.serialize()),200
+			people = people.query.filter_by(uid=people_uid).first()
+			if people is not None:
+				return jsonify(people.serialize()),200
 			else:
 				return jsonify({
-					"msg": "Person not found"
+					"msg": "people not found"
 				}), 404
 	
 
@@ -194,7 +193,7 @@ def handle_favorite(nature=None, name_uid=None, favorite_id= None):
 		print(nature)
 		if nature == "planet":	
 			favorite_delete = Favorite.query.filter_by(favorite_nature=1,favorite_uid=name_uid,user_id=user ).first()
-		if nature == "person":
+		if nature == "people":
 			favorite_delete = Favorite.query.filter_by(favorite_nature=2,favorite_uid=name_uid, user_id=user).first()
 		else:
 			pass
@@ -244,9 +243,9 @@ def handle_add_favorite(nature, name_uid):
 					return jsonify({
 									"msg": "Planet does not exist!"
 									}), 400
-			elif nature == "person":
+			elif nature == "people":
 				wildcard=2
-				name = Person.query.filter_by(person_name = body_name).first()
+				name = people.query.filter_by(people_name = body_name).first()
 				if name is not None:
 					
 					favorite= Favorite.query.filter_by(favorite_name=body_name, user_id=user).first()
@@ -265,11 +264,11 @@ def handle_add_favorite(nature, name_uid):
 							return jsonify(error.args), 500
 				else: 
 					return jsonify({
-									"msg": "Person does not exist!"
+									"msg": "people does not exist!"
 									}), 400
 			else:
 				return jsonify({
-								"msg": "Not a Planet or a Person!"
+								"msg": "Not a Planet or a people!"
 								}), 400
 		else:
 				return jsonify({

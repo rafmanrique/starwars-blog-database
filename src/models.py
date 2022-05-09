@@ -28,7 +28,7 @@ class User(db.Model):
 class Nature(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nature_name = db.Column(db.String(250))
-    nature_person = db.relationship('Person', backref="nature", uselist=True)
+    nature_people = db.relationship('People', backref="nature", uselist=True)
     nature_planet = db.relationship('Planet', backref="nature", uselist=True)
     nature_favorite = db.relationship('Favorite', backref="nature", uselist=True)
 
@@ -66,20 +66,20 @@ class Favorite(db.Model):
 			#do not serialize the password, it's a security breach
 		}
 
-class Person(db.Model):
+class People(db.Model):
     uid = db.Column(db.Integer, primary_key=True)
-    person_name = db.Column(db.String(250), unique=True)
-    person_nature = db.Column(db.Integer, db.ForeignKey("nature.id"))
+    people_name = db.Column(db.String(250), unique=True)
+    people_nature = db.Column(db.Integer, db.ForeignKey("nature.id"))
     
 
     def __repr__(self):
-        return f'<Person> f{self.uid}'
+        return f'<people> f{self.uid}'
 
     def serialize(self):
         return {
-			"person_name": self.person_name,
-			"person_nature":self.person_nature,
-            "person_uid":self.uid
+			"people_name": self.people_name,
+			"people_nature":self.people_nature,
+            "people_uid":self.uid
 			#do not serialize the password, it's a security breach
 		}
 
